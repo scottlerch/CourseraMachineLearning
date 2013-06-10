@@ -24,10 +24,26 @@ sigma = 0.3;
 %
 
 
+C_choices = [0.01, 0.03, 0.1, 0.3, 1, 3, 10, 30];
+sigma_choices = [0.01, 0.03, 0.1, 0.3, 1, 3, 10, 30];
+min_cv_error = Inf;
 
+for C_curr = C_choices
+	for sigma_curr = sigma_choices
 
+		model = svmTrain(X, y, C_curr, @(x1, x2) gaussianKernel(x1, x2, sigma_curr));
+		
+		predictions = svmPredict(model, Xval);
 
+		cv_error = mean(double(predictions ~= yval));
 
+		if cv_error < min_cv_error
+			min_cv_error = cv_error;
+			C = C_curr;
+			sigma = sigma_curr;
+		end
+	end
+end
 
 % =========================================================================
 
